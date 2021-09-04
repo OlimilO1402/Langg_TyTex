@@ -128,101 +128,102 @@ Private Function VectorBoundsToCode(vti As VarTypeInfo) As String
    VectorBoundsToCode = s
 End Function
 Private Function VarTypeToCode(ByVal vt As TliVarType) As String
-   Dim s As String
-   Select Case vt
-   Case VT_EMPTY:       s = "" ' Variant" '"Empty" 'no not Variant!
-   Case VT_NULL:        s = "Null"
-   Case VT_I2:          s = "Integer"
-   Case VT_I4:          s = "Long"
-   Case VT_R4:          s = "Single"
-   Case VT_R8:          s = "Double"
-   Case VT_CY:          s = "Currency" '???
-   Case VT_DATE:        s = "Date"
-   Case VT_BSTR:        s = "String"
-   Case VT_DISPATCH:    s = "IDispatch"
-   Case VT_ERROR:       s = "Error"
-   Case VT_BOOL:        s = "Boolean"
-   Case VT_VARIANT:     s = "Variant"
-   Case VT_UNKNOWN:     s = "IUnknown" '???
-   Case VT_DECIMAL:     s = "Decimal"
-   Case VT_I1:          s = "Byte"
-   Case VT_UI1:         s = "Byte" '"Unsigned Byte"
-   Case VT_UI2:         s = "Integer" '"Unsigned Integer"
-   Case VT_UI4:         s = "Long" '"Unsigned Long"
-   Case VT_I8:          s = "Currency" '"LongLong"
-   Case VT_UI8:         s = "Currency" '"UnsignedLongLong"
-   Case VT_INT:         s = "Long"
-   Case VT_UINT:        s = "Long" '"Unsigned Long"
-   Case VT_VOID:        s = "Long" '"Void"
-   Case VT_HRESULT:     s = "Long" '"HResult"
-   Case VT_PTR:         s = "Long" '"*"
-   Case VT_SAFEARRAY:   s = "SafeArray"
-   Case VT_CARRAY:      s = "()" '"[]"
-   Case VT_USERDEFINED: s = "UDType"
-   Case VT_LPSTR:       s = "String" '"LPSTR"
-   Case VT_LPWSTR:      s = "String" '"LPWSTR"
-   Case VT_RECORD:      s = "UDType"
-   Case VT_FILETIME:    s = "FileTime"
-   Case VT_BLOB:        s = "Blob"
-   Case VT_STREAM:      s = "Stream"
-   Case VT_STORAGE:     s = "Storage"
-   Case VT_STREAMED_OBJECT: s = "Streamed Object"
-   Case VT_STORED_OBJECT:   s = "Stored Object"
-   Case VT_BLOB_OBJECT:     s = "Blob Object"
-   Case VT_CF:          s = "CF" '???
-   Case VT_CLSID:       s = "CLSID"
-   Case VT_VECTOR:      s = "Vector" 'fixed array!
-   Case VT_BYREF:       s = "ByRef"
-   Case VT_RESERVED:    s = "Reserved"
-   Case Else:           s = "&H" & Hex$(vt)
-   End Select
-   
-'   If vt And VT_EMPTY Then s = s & "Empty"
-'   If vt And VT_NULL Then s = s & "Null"
-'   If vt And VT_I2 Then s = s & "Integer"
-'   If vt And VT_I4 Then s = s & "Long"
-'   If vt And VT_R4 Then s = s & "Single"
-'   If vt And VT_R8 Then s = s & "Double"
-'   If vt And VT_CY Then s = s & "Currency"
-'   If vt And VT_DATE Then s = s & "Date"
-'   If vt And VT_BSTR Then s = s & "String"
-'   If vt And VT_DISPATCH Then s = s & "IDispatch"
-'   If vt And VT_ERROR Then s = s & "Error"
-'   If vt And VT_BOOL Then s = s & "Boolean"
-'   If vt And VT_VARIANT Then s = s & "Variant"
-'   If vt And VT_UNKNOWN Then s = s & "IUnknown"
-'   If vt And VT_DECIMAL Then s = s & "Decimal"
-'   If vt And VT_I1 Then s = s & "Byte"
-'   If vt And VT_UI1 Then s = s & "Unsigned Byte"
-'   If vt And VT_UI2 Then s = s & "Unsigned Integer"
-'   If vt And VT_UI4 Then s = s & "Unsigned Long"
-'   If vt And VT_I8 Then s = s & "LongLong"
-'   If vt And VT_UI8 Then s = s & "Unsigned LongLong"
-'   If vt And VT_INT Then s = s & "Long"
-'   If vt And VT_UINT Then s = s & "Unsigned Long"
-'   If vt And VT_VOID Then s = s & "Void"
-'   If vt And VT_HRESULT Then s = s & "HResult"
-'   If vt And VT_PTR Then s = s & "*"
-'   If vt And VT_SAFEARRAY Then s = s & "SafeArray"
-'   If vt And VT_CARRAY Then s = s & "[]"
-'   If vt And VT_USERDEFINED Then s = s & "UDType"
-'   If vt And VT_LPSTR Then s = s & "String"
-'   If vt And VT_LPWSTR Then s = s & "String"
-'   If vt And VT_RECORD Then s = s & "UDType"
-'   If vt And VT_FILETIME Then s = s & "FileTime"
-'   If vt And VT_BLOB Then s = s & "Blob"
-'   If vt And VT_STREAM Then s = s & "Stream"
-'   If vt And VT_STORAGE Then s = s & "Storage"
-'   If vt And VT_STREAMED_OBJECT Then s = s & "Streamed Object"
-'   If vt And VT_STORED_OBJECT Then s = s & "Stored Object"
-'   If vt And VT_BLOB_OBJECT Then s = s & "Blob Object"
-'   If vt And VT_CF Then s = s & "CF"
-'   If vt And VT_CLSID Then s = s & "CLSID"
-'   If vt And VT_VECTOR Then s = s & "Vector"
-'   If vt And VT_BYREF Then s = s & "ByRef"
-'   If vt And VT_RESERVED Then s = s & "Reserved"
-   
-   VarTypeToCode = s
+    VarTypeToCode = MEVbVarType.EVbVarType_ToStr(vt)
+'   Dim s As String
+'   Select Case vt
+'   Case VT_EMPTY:       s = "" ' Variant" '"Empty" 'no not Variant!
+'   Case VT_NULL:        s = "Null"
+'   Case VT_I2:          s = "Integer"
+'   Case VT_I4:          s = "Long"
+'   Case VT_R4:          s = "Single"
+'   Case VT_R8:          s = "Double"
+'   Case VT_CY:          s = "Currency" '???
+'   Case VT_DATE:        s = "Date"
+'   Case VT_BSTR:        s = "String"
+'   Case VT_DISPATCH:    s = "IDispatch"
+'   Case VT_ERROR:       s = "Error"
+'   Case VT_BOOL:        s = "Boolean"
+'   Case VT_VARIANT:     s = "Variant"
+'   Case VT_UNKNOWN:     s = "IUnknown" '???
+'   Case VT_DECIMAL:     s = "Decimal"
+'   Case VT_I1:          s = "Byte"
+'   Case VT_UI1:         s = "Byte" '"Unsigned Byte"
+'   Case VT_UI2:         s = "Integer" '"Unsigned Integer"
+'   Case VT_UI4:         s = "Long" '"Unsigned Long"
+'   Case VT_I8:          s = "Currency" '"LongLong"
+'   Case VT_UI8:         s = "Currency" '"UnsignedLongLong"
+'   Case VT_INT:         s = "Long"
+'   Case VT_UINT:        s = "Long" '"Unsigned Long"
+'   Case VT_VOID:        s = "Long" '"Void"
+'   Case VT_HRESULT:     s = "Long" '"HResult"
+'   Case VT_PTR:         s = "Long" '"*"
+'   Case VT_SAFEARRAY:   s = "SafeArray"
+'   Case VT_CARRAY:      s = "()" '"[]"
+'   Case VT_USERDEFINED: s = "UDType"
+'   Case VT_LPSTR:       s = "String" '"LPSTR"
+'   Case VT_LPWSTR:      s = "String" '"LPWSTR"
+'   Case VT_RECORD:      s = "UDType"
+'   Case VT_FILETIME:    s = "FileTime"
+'   Case VT_BLOB:        s = "Blob"
+'   Case VT_STREAM:      s = "Stream"
+'   Case VT_STORAGE:     s = "Storage"
+'   Case VT_STREAMED_OBJECT: s = "Streamed Object"
+'   Case VT_STORED_OBJECT:   s = "Stored Object"
+'   Case VT_BLOB_OBJECT:     s = "Blob Object"
+'   Case VT_CF:          s = "CF" '???
+'   Case VT_CLSID:       s = "CLSID"
+'   Case VT_VECTOR:      s = "Vector" 'fixed array!
+'   Case VT_BYREF:       s = "ByRef"
+'   Case VT_RESERVED:    s = "Reserved"
+'   Case Else:           s = "&H" & Hex$(vt)
+'   End Select
+'
+''   If vt And VT_EMPTY Then s = s & "Empty"
+''   If vt And VT_NULL Then s = s & "Null"
+''   If vt And VT_I2 Then s = s & "Integer"
+''   If vt And VT_I4 Then s = s & "Long"
+''   If vt And VT_R4 Then s = s & "Single"
+''   If vt And VT_R8 Then s = s & "Double"
+''   If vt And VT_CY Then s = s & "Currency"
+''   If vt And VT_DATE Then s = s & "Date"
+''   If vt And VT_BSTR Then s = s & "String"
+''   If vt And VT_DISPATCH Then s = s & "IDispatch"
+''   If vt And VT_ERROR Then s = s & "Error"
+''   If vt And VT_BOOL Then s = s & "Boolean"
+''   If vt And VT_VARIANT Then s = s & "Variant"
+''   If vt And VT_UNKNOWN Then s = s & "IUnknown"
+''   If vt And VT_DECIMAL Then s = s & "Decimal"
+''   If vt And VT_I1 Then s = s & "Byte"
+''   If vt And VT_UI1 Then s = s & "Unsigned Byte"
+''   If vt And VT_UI2 Then s = s & "Unsigned Integer"
+''   If vt And VT_UI4 Then s = s & "Unsigned Long"
+''   If vt And VT_I8 Then s = s & "LongLong"
+''   If vt And VT_UI8 Then s = s & "Unsigned LongLong"
+''   If vt And VT_INT Then s = s & "Long"
+''   If vt And VT_UINT Then s = s & "Unsigned Long"
+''   If vt And VT_VOID Then s = s & "Void"
+''   If vt And VT_HRESULT Then s = s & "HResult"
+''   If vt And VT_PTR Then s = s & "*"
+''   If vt And VT_SAFEARRAY Then s = s & "SafeArray"
+''   If vt And VT_CARRAY Then s = s & "[]"
+''   If vt And VT_USERDEFINED Then s = s & "UDType"
+''   If vt And VT_LPSTR Then s = s & "String"
+''   If vt And VT_LPWSTR Then s = s & "String"
+''   If vt And VT_RECORD Then s = s & "UDType"
+''   If vt And VT_FILETIME Then s = s & "FileTime"
+''   If vt And VT_BLOB Then s = s & "Blob"
+''   If vt And VT_STREAM Then s = s & "Stream"
+''   If vt And VT_STORAGE Then s = s & "Storage"
+''   If vt And VT_STREAMED_OBJECT Then s = s & "Streamed Object"
+''   If vt And VT_STORED_OBJECT Then s = s & "Stored Object"
+''   If vt And VT_BLOB_OBJECT Then s = s & "Blob Object"
+''   If vt And VT_CF Then s = s & "CF"
+''   If vt And VT_CLSID Then s = s & "CLSID"
+''   If vt And VT_VECTOR Then s = s & "Vector"
+''   If vt And VT_BYREF Then s = s & "ByRef"
+''   If vt And VT_RESERVED Then s = s & "Reserved"
+'
+'   VarTypeToCode = s
 End Function
 
 
@@ -443,31 +444,31 @@ Private Function ImplementsToCode(aClass As TLI.CoClassInfo) As String
    ImplementsToCode = s
 End Function
 
-Private Function VBVarType_ToStr(vt As VbVarType) As String
-    Dim s As String
-    Select Case vt
-    Case vbArray:           s = "Array"
-    Case vbBoolean:         s = "Boolean"
-    Case vbByte:            s = "Byte"
-    Case vbCurrency:        s = "Currency"
-    Case vbDataObject:      s = "DataObject"
-    Case vbDate:            s = "Date"
-    Case vbDecimal:         s = "Decimal"
-    Case vbDouble:          s = "Double"
-    Case vbEmpty:           s = "Empty"
-    Case vbError:           s = "Error"
-    Case vbInteger:         s = "Integer"
-    Case vbLong:            s = "Long"
-    Case vbNull:            s = "Null"
-    Case vbObject:          s = "Object"
-    Case vbSingle:          s = "Single"
-    Case vbString:          s = "String"
-    Case vbUserDefinedType: s = "UserDefinedType"
-    Case vbVariant:         s = "Variant"
-    Case Else:              s = CStr(vt)
-    End Select
-    VBVarType_ToStr = s
-End Function
+'Private Function VBVarType_ToStr(vt As VbVarType) As String
+'    Dim s As String
+'    Select Case vt
+'    Case vbArray:           s = "Array"
+'    Case vbBoolean:         s = "Boolean"
+'    Case vbByte:            s = "Byte"
+'    Case vbCurrency:        s = "Currency"
+'    Case vbDataObject:      s = "DataObject"
+'    Case vbDate:            s = "Date"
+'    Case vbDecimal:         s = "Decimal"
+'    Case vbDouble:          s = "Double"
+'    Case vbEmpty:           s = "Empty"
+'    Case vbError:           s = "Error"
+'    Case vbInteger:         s = "Integer"
+'    Case vbLong:            s = "Long"
+'    Case vbNull:            s = "Null"
+'    Case vbObject:          s = "Object"
+'    Case vbSingle:          s = "Single"
+'    Case vbString:          s = "String"
+'    Case vbUserDefinedType: s = "UserDefinedType"
+'    Case vbVariant:         s = "Variant"
+'    Case Else:              s = CStr(vt)
+'    End Select
+'    VBVarType_ToStr = s
+'End Function
 ' ########## '   Alias   ' ########## '
 Private Function ICoder_AliasToCode(aAlias As TLI.IntrinsicAliasInfo) As String
     Dim s As String
@@ -482,7 +483,8 @@ Private Function ICoder_AliasToCode(aAlias As TLI.IntrinsicAliasInfo) As String
 '        End With
 '        MInd.Pop
 '    End If
-    s = s & "Alias " & aAlias.Name & " As " & VBVarType_ToStr(aAlias.ResolvedType) '& " " & aAlias.TypeKindString
+
+    s = s & "Alias " & aAlias.Name & " As " & VarTypeToCode(aAlias.ResolvedType) '& " " & aAlias.TypeKindString
     ICoder_AliasToCode = s
 End Function
 
