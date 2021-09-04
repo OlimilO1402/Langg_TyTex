@@ -19,7 +19,7 @@ Begin VB.Form FMain
       TabIndex        =   2
       Top             =   360
       Width           =   9975
-      Begin VB.TextBox Text1 
+      Begin VB.TextBox TBCode 
          BeginProperty Font 
             Name            =   "Consolas"
             Size            =   9.75
@@ -37,7 +37,7 @@ Begin VB.Form FMain
          Top             =   0
          Width           =   6735
       End
-      Begin VB.ListBox List1 
+      Begin VB.ListBox LBTypes 
          BeginProperty Font 
             Name            =   "Consolas"
             Size            =   9.75
@@ -177,13 +177,14 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
-'TyITex, the tight typelibinfo extractor
+'TyTex, the tight typelibinfo extractor
 Dim myTlb   As TypeLibrary    'the typelibrary file or from registry
 Dim col     As New Collection 'for selecting from combobox
 Dim myCoder As ICoder         'what do you want? VB, VB.NET, Java, Cpp, Delphi ... ?
 Dim SearchForName As String
 Dim SearchIndex   As Long
 Dim WithEvents Splitter1 As Splitter
+Attribute Splitter1.VB_VarHelpID = -1
 
 Private Sub Form_Load()
     
@@ -227,20 +228,16 @@ Private Sub Form_Load()
     Combo1.AddItem "SHDocVwCtl":    col.Add "File | C:\WINDOWS\system32\ieframe.oca"                   ' Microsoft Internet Controls
 
 '   Combo1.AddItem "rvbparsero":    col.Add "File | C:\Programme\Microsoft Visual Studio\Common\Tools\VS-Ent98\vmodeler\rvbparsero.dll" 'Rose 4.0/Visual Basic Parser
-'
-
 '   Combo1.AddItem "TabDlg":        col.Add "File |
-   ' Combo1.AddItem
+   
    Combo1.ListIndex = 0
    UpdateForm
    Call SetMnuHelpstringChecked(MHelpCode.MyLCID)
    Set Splitter1 = New Splitter
-   Splitter1.New_ False, Me, Me.Panel1, "Splitter1", Me.List1, Me.Text1
-   Splitter1.LeftTopPos = Me.List1.Width
+   Splitter1.New_ False, Me, Me.Panel1, "Splitter1", Me.LBTypes, Me.TBCode
+   Splitter1.LeftTopPos = Me.LBTypes.Width
    Splitter1.BorderStyle = bsXPStyl
-   'Splitter1.IsHorizontal = True
-   'Splitter1.ResizeControls
-   'Splitter1.Refresh
+
 End Sub
 
 Sub ResetSearch()
@@ -249,21 +246,13 @@ Sub ResetSearch()
 End Sub
 
 Private Sub Form_Resize()
-   Dim l As Single, T As Single, W As Single, H As Single
-   Dim brdr As Single: 'brdr = 8 * IIf(Me.ScaleMode = vbTwips, Screen.TwipsPerPixelX, 1)
+   Dim L As Single, T As Single, W As Single, H As Single
    T = Panel1.Top
    W = Me.ScaleWidth
    H = Me.ScaleHeight - T
-   'L = List1.Left: T = List1.Top
-   'W = List1.Width
-   'H = Me.ScaleHeight - T - brdr
-   'If W > 0 And H > 0 Then List1.Move L, T, W, H
-   'L = L + W + brdr
-   'W = Me.ScaleWidth - L - brdr
-   If W > 0 And H > 0 Then
-      'Text1.Move L, T, W, H
-      'Text2.Width = W
-      Panel1.Move l, T, W, H
+      If W > 0 And H > 0 Then
+      Panel1.Move L, T, W, H
+      Text2.Width = TBCode.Width
    End If
 End Sub
 
@@ -273,20 +262,13 @@ Public Property Get OFD() As OpenFileDialog
     OFD.FilterIndex = 1
     OFD.InitialDirectory = App.Path
 End Property
+
 Public Property Get SFD() As SaveFileDialog
     Set SFD = New SaveFileDialog
     SFD.Filter = GetFilter
     SFD.FilterIndex = 1
     SFD.InitialDirectory = App.Path
 End Property
-
-'    Dim flt As String
-'    flt = flt & "VB-Komponenten (*.ocx, *.oca)|*.ocx;*.oca|"
-'    flt = flt & "ActiveXdlls (*.dll)|*.dll|"
-'    flt = flt & "Typelibraries (*.tlb, *.olb)|*.tlb;*olb|"
-'    flt = flt & "(ocx, dll, tlb) |*.ocx;*.oca;*.dll;*.tlb;*.olb|"
-'    flt = flt & "Alle Dateien (*.*)|*.*"
-'    OFD.Filter = flt
 
 Private Function GetFilter() As String
     Dim flt As String
@@ -302,7 +284,7 @@ Private Sub Combo1_Click()
    Call OpenTlB(Combo1.ListIndex, True)
 End Sub
 
-Private Sub List1_Click()
+Private Sub LBTypes_Click()
    mnuExtrasStatisticEvents.Checked = False
    mnuExtrasStatisticMethod.Checked = False
    Call UpdateCode
@@ -312,36 +294,21 @@ Private Sub mnuCodeSearch_Click()
     Dim s As String: s = InputBox("What do you want to find, give a name:", "Search for a name", SearchForName)
     If StrPtr(s) = 0 Then Exit Sub 'Cancel
     SearchForName = s
-    
-    'If Len(s) Then
-    '    SearchForName = s
     SearchIndex = -1
     SearchIndex = SearchNext(SearchForName, SearchIndex)
-        
     mnuCodeSearchNext.Enabled = True
-        
-'        Dim si As String
-'        Dim i As Long
-'        Dim n As Long: n = List1.ListCount
-'        For i = 0 To n - 1
-'            si = List1.List(i)
-'            If InStr(1, si, SearchForName, vbTextCompare) > 0 Then
-'                'List1.Text = si
-'                List1.ListIndex = i
-'            End If
-'        Next
-'    End If
 End Sub
+
 Function SearchNext(aName As String, ByVal startIndex As Long) As Long
     'return the found Index
     Dim si As String
     Dim i As Long
-    Dim n As Long: n = List1.ListCount
+    Dim n As Long: n = LBTypes.ListCount
     For i = startIndex + 1 To n - 1
-        si = List1.List(i)
+        si = LBTypes.List(i)
         If InStr(1, si, aName, vbTextCompare) > 0 Then
-            'List1.Text = si
-            List1.ListIndex = i
+            'LBTypes.Text = si
+            LBTypes.ListIndex = i
             SearchNext = i
             Exit Function
         End If
@@ -357,45 +324,37 @@ Private Sub mnuHelpInfo_Click()
 End Sub
 
 Private Sub mnuTlbOpenFile_Click()
-    'On Error GoTo catch
     Dim aOFD As OpenFileDialog: Set aOFD = Me.OFD
     If Not myTlb Is Nothing Then 'no not IIf !!!
         aOFD.InitialDirectory = GetDir(myTlb.FileName)
     Else
         aOFD.InitialDirectory = "C:\Windows\System32\"
     End If
-    'OFD.FilterIndex = 1
-    'OFD.CancelError = True
-    'OFD.FileName = "D:\VB60To_dotNETClasses\VB6_To_Delphi\FastGeoD\Tlb\MBOFastGeoD.tlb"
-    'OFD.FileName = "C:\Windows\System32\
-    'OFD.FileName = ""
-    'OFD.FileName = "msvbvm60.dll"
-    'OFD.FileName = "tlbinf32.dll"
-    'OFD.FileName = "stdole2.tlb"
-    'OFD.FileName = "C:\Programme\Microsoft Visual Studio\VB98\VB6.OLB"
     If aOFD.ShowDialog = vbCancel Then Exit Sub
     If Len(aOFD.FileName) > 0 Then
         Dim f As String: f = aOFD.FileName
         Dim s As String: s = "File | " & f
         Combo1.AddItem myTlb.TypeLibInfo.Name:  col.Add s
         Combo1.ListIndex = Combo1.ListCount - 1
-        Call OpenFile(f)
+        OpenFile f
     End If
 End Sub
+
 Private Sub mnuTlbOpenReg_Click()
     Dim s As String: s = InputBox("Please give: guid maj min lcid")
     If StrPtr(s) = 0 Then Exit Sub
     Dim sa() As String: sa = Split(s, " ")
-    Call OpenReg(sa)
-    'Dim s As String
+    OpenReg sa
     s = Join(sa, " | ") ' sa(1) & " | " & sa(2) & " | " & sa(3)
     Combo1.AddItem myTlb.TypeLibInfo.Name:  col.Add s
 End Sub
+
 Private Sub mnuTlbOpenDir_Click()
     If Not myTlb Is Nothing Then
         Shell "Explorer " & GetDir(myTlb.FileName), vbNormalFocus
     End If
 End Sub
+
 Private Sub mnuTlbSaveAs_Click()
    Dim aSFD As SaveFileDialog: Set aSFD = Me.SFD
    'OFD.ShowSave
@@ -415,6 +374,7 @@ Private Sub mnuTlbSaveAs_Click()
       Next
    End If
 End Sub
+
 Private Sub mnuTlbExit_Click()
     Unload Me
 End Sub
@@ -422,9 +382,11 @@ End Sub
 Private Sub mnuCodeVB_Click()
     Call SelectCoder(New CoderVB)
 End Sub
+
 Private Sub mnuCodeJava_Click()
     Call SelectCoder(New CoderJava)
 End Sub
+
 Private Sub mnuCodeCpp_Click()
    Call SelectCoder(New CoderCpp)
 End Sub
@@ -441,6 +403,7 @@ Private Sub SelectCoder(aCoder As ICoder)
     End Select
     UpdateCode
 End Sub
+
 Private Sub mnuCodeIndent_Click()
     'Dim s As String: s = InputBox("Indentation?", "Indentation Size:", CStr(MInd.IndentSize))
     'If Len(s) And IsNumeric(s) Then MInd.MyIndentSize = CLng(s)
@@ -453,11 +416,13 @@ Private Sub mnuHelpstringLcidENUS_Click()
     Call SetMnuHelpstringChecked(MHelpCode.MyLCID)
     UpdateCode
 End Sub
+
 Private Sub mnuHelpstringLcidDEDE_Click()
     MHelpCode.MyLCID = 1
     Call SetMnuHelpstringChecked(MHelpCode.MyLCID)
     UpdateCode
 End Sub
+
 Private Sub mnuHelpstringLcidSpecify_Click()
     Dim s As String: s = InputBox("LCID:", "LCID?", "&H" & Hex$(MHelpCode.MyLCID))
     If s <> vbNullString Then
@@ -468,6 +433,7 @@ Private Sub mnuHelpstringLcidSpecify_Click()
         End If
     End If
 End Sub
+
 Private Sub mnuHelpstringAuthor_Click()
     If Len(MHelpCode.MyAuthorName) = 0 Then
         MHelpCode.MyAuthorName = "OlimilO"
@@ -475,6 +441,7 @@ Private Sub mnuHelpstringAuthor_Click()
     MHelpCode.MyAuthorName = InputBox("Authors name:", "Authors name?", MHelpCode.MyAuthorName)
     UpdateCode
 End Sub
+
 Private Sub SetMnuHelpstringChecked(ByVal LCID As Long)
     mnuHelpstringLcidENUS.Checked = IIf(LCID = 0, True, False)
     mnuHelpstringLcidDEDE.Checked = IIf(LCID = 1, True, False)
@@ -483,13 +450,15 @@ Private Sub SetMnuHelpstringChecked(ByVal LCID As Long)
     sa(2) = "&&H" & Hex$(LCID)
     mnuHelpstringLcidSpecify.Caption = Join(sa, " ")
 End Sub
+
 Private Sub mnuExtrasStatisticEvents_Click()
-    Text1.Text = myTlb.getEventsStatistic
+    TBCode.Text = myTlb.getEventsStatistic
     mnuExtrasStatisticEvents.Checked = True
     mnuExtrasStatisticMethod.Checked = False
 End Sub
+
 Private Sub mnuExtrasStatisticMethod_Click()
-    Text1.Text = myTlb.getMethodsStatistic
+    TBCode.Text = myTlb.getMethodsStatistic
     mnuExtrasStatisticEvents.Checked = False
     mnuExtrasStatisticMethod.Checked = True
 End Sub
@@ -500,29 +469,31 @@ Private Sub OpenTlB(i As Integer, ByVal bUpdateView As Boolean)
     Dim sa() As String: sa = Split(s, " | ")
     Dim aNewTlb As New TypeLibrary
     If sa(0) = "File" Then
-        'Call aNewTlb.LoadFile(aFilename)
-        Call aNewTlb.LoadFile(sa(1))
+        aNewTlb.LoadFile sa(1)
     Else
-        Call aNewTlb.LoadReg(sa(0), sa(1), sa(2), sa(3))
+        aNewTlb.LoadReg sa(0), sa(1), sa(2), sa(3)
     End If
     If Not aNewTlb.TypeLibInfo Is Nothing Then
         Set myTlb = aNewTlb
         If bUpdateView Then
-            Call UpdateForm
-            Call UpdateView
+            UpdateForm
+            UpdateView
         End If
     End If
 End Sub
+
 Private Sub OpenFile(aFilename As String)
     Dim aNewTlb As New TypeLibrary
     Call aNewTlb.LoadFile(aFilename)
     Set NewTlB = aNewTlb
 End Sub
+
 Private Sub OpenReg(sa() As String)
     Dim aNewTlb As New TypeLibrary
     Call aNewTlb.LoadReg(sa(0), sa(1), sa(2), sa(3))
     Set NewTlB = aNewTlb
 End Sub
+
 Private Property Set NewTlB(aNewTlb As TypeLibrary)
     If Not aNewTlb.TypeLibInfo Is Nothing Then
         Set myTlb = aNewTlb
@@ -532,27 +503,27 @@ Private Property Set NewTlB(aNewTlb As TypeLibrary)
 End Property
 
 Private Sub UpdateForm()
-    Me.Caption = "TyITEx - [" & myTlb.TypeLibInfo.Name & ": " & myTlb.FileName & "]"
+    Me.Caption = App.EXEName & " - [" & myTlb.TypeLibInfo.Name & ": " & myTlb.FileName & "]"
 End Sub
+
 Private Sub UpdateView()
-    Call myTlb.TypesToListBox(List1)
-    Text2.Text = myTlb.ToString 'myTlb.TypeLibInfo.Name & " " & myTlb.TypeLibInfo.Guid
+    myTlb.TypesToListBox LBTypes
+    Text2.Text = myTlb.ToString
     UpdateCode
 End Sub
+
 Private Sub UpdateCode()
     If Me.mnuExtrasStatisticEvents.Checked = True Then
-        Text1.Text = myTlb.getEventsStatistic
+        TBCode.Text = myTlb.getEventsStatistic
     ElseIf Me.mnuExtrasStatisticMethod.Checked = True Then
-        Text1.Text = myTlb.getEventsStatistic
+        TBCode.Text = myTlb.getEventsStatistic
     Else
-        If List1.ListIndex < 0 Then
-            List1.ListIndex = 0
+        If LBTypes.ListIndex < 0 Then
+            LBTypes.ListIndex = 0
         End If
-        Dim item As String: item = List1.List(List1.ListIndex)
+        Dim item As String: item = LBTypes.List(LBTypes.ListIndex)
         If Len(item) > 0 Then
-            Call myTlb.ItemToTextBox(myCoder, item, Text1)
-            'Call Scin1.addText(myTlb.ItemToString(myCoder, item)) '???
-            'Scin1.Redraw = True
+            myTlb.ItemToTextBox myCoder, item, TBCode
         End If
     End If
 End Sub
@@ -560,5 +531,5 @@ End Sub
 Private Sub Splitter1_OnMove(Sender As Splitter)
     Combo1.Width = Sender.LeftTopPos
     Text2.Left = Sender.LeftTopPos + Sender.Width
-    Text2.Width = Text1.Width
+    Text2.Width = TBCode.Width
 End Sub
