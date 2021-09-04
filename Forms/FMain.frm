@@ -1,11 +1,12 @@
 VERSION 5.00
 Object = "{F9043C88-F6F2-101A-A3C9-08002B2F49FB}#1.2#0"; "COMDLG32.OCX"
 Begin VB.Form FMain 
-   Caption         =   "TyITEx"
+   Caption         =   "TyTex"
    ClientHeight    =   7545
    ClientLeft      =   225
    ClientTop       =   870
    ClientWidth     =   11325
+   Icon            =   "FMain.frx":0000
    LinkTopic       =   "Form1"
    ScaleHeight     =   7545
    ScaleWidth      =   11325
@@ -59,30 +60,35 @@ Begin VB.Form FMain
       _Version        =   393216
    End
    Begin VB.Menu mnuTlb 
-      Caption         =   "TypeLib"
+      Caption         =   "File"
       Begin VB.Menu mnuTlbOpenFile 
-         Caption         =   "Open File"
+         Caption         =   "Open"
+         Shortcut        =   ^O
       End
       Begin VB.Menu mnuTlbOpenReg 
          Caption         =   "Open Registrykey"
+         Shortcut        =   ^R
       End
       Begin VB.Menu mnuTlbSep1 
          Caption         =   "-"
       End
       Begin VB.Menu mnuTlbOpenDir 
          Caption         =   "Goto Directory"
+         Shortcut        =   ^G
       End
       Begin VB.Menu mnuTlbSep2 
          Caption         =   "-"
       End
       Begin VB.Menu mnuTlbSaveAs 
          Caption         =   "Save As..."
+         Shortcut        =   ^S
       End
       Begin VB.Menu mnuTlbSep3 
          Caption         =   "-"
       End
       Begin VB.Menu mnuTlbExit 
          Caption         =   "Exit"
+         Shortcut        =   ^X
       End
    End
    Begin VB.Menu mnuCode 
@@ -99,11 +105,16 @@ Begin VB.Form FMain
       Begin VB.Menu mnuCodeSep1 
          Caption         =   "-"
       End
+      Begin VB.Menu mnuCodeIndent 
+         Caption         =   "Indentation"
+      End
       Begin VB.Menu mnuCodeSearch 
          Caption         =   "Search"
       End
-      Begin VB.Menu mnuCodeIndent 
-         Caption         =   "Indentation"
+      Begin VB.Menu mnuCodeSearchNext 
+         Caption         =   "Search Next"
+         Enabled         =   0   'False
+         Shortcut        =   {F3}
       End
    End
    Begin VB.Menu mnuHelpstring 
@@ -133,6 +144,12 @@ Begin VB.Form FMain
          Caption         =   "Statistic Methods"
       End
    End
+   Begin VB.Menu mnuHelp 
+      Caption         =   " ? "
+      Begin VB.Menu mnuHelpInfo 
+         Caption         =   "Info"
+      End
+   End
 End
 Attribute VB_Name = "FMain"
 Attribute VB_GlobalNameSpace = False
@@ -144,41 +161,45 @@ Option Explicit
 Dim myTlb   As TypeLibrary    'the typelibrary file or from registry
 Dim col     As New Collection 'for selecting from combobox
 Dim myCoder As ICoder         'what do you want? VB, VB.NET, Java, Cpp, Delphi ... ?
+Dim SearchForName As String
+Dim SearchIndex   As Long
 
 Private Sub Form_Load()
-   MInd.IndentSize = 4
-   MHelpCode.MyAuthorName = "OlimilO"
-   Me.mnuCodeVB.Checked = True
-   Set myCoder = New CoderVB
-   'Combo1.AddItem "MBOFastGeoD":   col.Add "File | D:\VB60To_dotNETClasses\VB6_To_Delphi\FastGeoD\Tlb\MBOFastGeoD.tlb"
-   Combo1.AddItem "VBA":           col.Add "File | C:\WINDOWS\system32\msvbvm60.dll"
-   Combo1.AddItem "VBRUN":         col.Add "{EA544A21-C82D-11D1-A3E4-00A0C90AEA82} | 6 | 0 | 9"
-   Combo1.AddItem "VB":            col.Add "File | C:\Program Files\Microsoft Visual Studio\VB98\VB6.OLB"
-   Combo1.AddItem "VBIDE":         col.Add "File | C:\Program Files\Microsoft Visual Studio\VB98\VB6EXT.OLB" '
-   Combo1.AddItem "stdole":        col.Add "File | C:\Windows\system32\stdole2.tlb"     ' OLE Automation
-   Combo1.AddItem "TLI":           col.Add "File | C:\Windows\system32\tlbinf32.dll"    ' TypeLib Information
-   Combo1.AddItem "ComCtl2":       col.Add "File | C:\Windows\system32\ComCt232.oca"    ' Microsoft Windows-Standardsteuerelemente-2 5.0
-   Combo1.AddItem "ComCtl3":       col.Add "File | C:\Windows\system32\Comct332.oca"    ' Microsoft Windows Common Controls-3 6.0 (SP5)
-   Combo1.AddItem "ComctlLib":     col.Add "File | C:\Windows\system32\comctl32.oca"    ' Microsoft Windows-Standardsteuerelemente 5.0 (SP2)
-   Combo1.AddItem "MCI":           col.Add "File | C:\Windows\system32\mci32.oca"       ' Microsoft Multimedia-Steuerelement 6.0
-   Combo1.AddItem "MSACAL":        col.Add "File | C:\Windows\system32\MSCAL.oca"       ' Microsoft Calendar Control 8.0
-   Combo1.AddItem "MSComDlg":      col.Add "File | C:\Windows\system32\ComDlg32.oca"    ' Microsoft Standarddialog-Steuerelement 6.0
-   Combo1.AddItem "MSCommLib":     col.Add "File | C:\Windows\system32\MSComm32.oca"    ' Microsoft Kommunikations-Steuerelement 6.0
-   Combo1.AddItem "MSDBCtls":      col.Add "File | C:\Windows\system32\dblist32.oca"    ' Microsoft - Datengebundene Listensteuerelemente 6.0
-   Combo1.AddItem "MSDBGrid":      col.Add "File | C:\Windows\system32\DBGRID32.oca"    ' Microsoft Datengebundenes Tabellensteuerelement 5.0 (SP3)
-   Combo1.AddItem "MSFlexGridLib": col.Add "File | C:\Windows\system32\MSFlxGrd.oca"    ' Microsoft FlexTabelle-Steuerelement (FlexGrid) 6.0
-   Combo1.AddItem "MSMask":        col.Add "File | C:\Windows\system32\msmask32.oca"    ' Microsoft Formatierte Bearbeitung-Steuerelement 6.0
-   Combo1.AddItem "RichTextLib":   col.Add "File | C:\Windows\system32\richtx32.oca"    ' Microsoft RTF-Steuerelement 6.0
-   Combo1.AddItem "TabDlg":        col.Add "File | C:\Windows\system32\TABCTL32.oca"    ' Microsoft Register-Steuerelement 6.0
-   Combo1.AddItem "MSXML2":        col.Add "File | C:\Windows\system32\msxml6.dll"      ' Microsoft XML, v6.0
-   Combo1.AddItem "Scripting":     col.Add "File | C:\Windows\system32\scrrun.dll"      ' Microsoft Scripting Runtime
-   Combo1.AddItem "WScript":       col.Add "File | C:\Windows\system32\Wshom.ocx"       ' Windows Script Host Object Model
-   Combo1.AddItem "Forms2":        col.Add "File | C:\Windows\System32\FM20.dll"        ' Microsoft Forms 2.0 Object Library
-   Combo1.AddItem "Office":        col.Add "File | C:\Program Files\Common Files\Microsoft Shared\OFFICE16\MSO.dll" '
-   Combo1.AddItem "Word":          col.Add "File | C:\Program Files\Microsoft Office\Office16\MSWORD.OLB" '
-   Combo1.AddItem "Excel":         col.Add "File | C:\Program Files\Microsoft Office\OFFICE16\EXCEL.EXE"  ' Microsoft Excel 11.0 Object Library
-   Combo1.AddItem "SHDocVwCtl":    col.Add "File | C:\WINDOWS\system32\ieframe.oca"                   ' Microsoft Internet Controls
-
+    
+    ResetSearch
+    
+    MInd.IndentSize = 4
+    MHelpCode.MyAuthorName = "OlimilO"
+    Me.mnuCodeVB.Checked = True
+    Set myCoder = New CoderVB
+    'Combo1.AddItem "MBOFastGeoD":   col.Add "File | D:\VB60To_dotNETClasses\VB6_To_Delphi\FastGeoD\Tlb\MBOFastGeoD.tlb"
+    Combo1.AddItem "VBA":           col.Add "File | C:\WINDOWS\system32\msvbvm60.dll"
+    Combo1.AddItem "VBRUN":         col.Add "{EA544A21-C82D-11D1-A3E4-00A0C90AEA82} | 6 | 0 | 9"
+    Combo1.AddItem "VB":            col.Add "File | C:\Program Files\Microsoft Visual Studio\VB98\VB6.OLB"
+    Combo1.AddItem "VBIDE":         col.Add "File | C:\Program Files\Microsoft Visual Studio\VB98\VB6EXT.OLB" '
+    Combo1.AddItem "stdole":        col.Add "File | C:\Windows\system32\stdole2.tlb"     ' OLE Automation
+    Combo1.AddItem "TLI":           col.Add "File | C:\Windows\system32\tlbinf32.dll"    ' TypeLib Information
+    Combo1.AddItem "ComCtl2":       col.Add "File | C:\Windows\system32\ComCt232.oca"    ' Microsoft Windows-Standardsteuerelemente-2 5.0
+    Combo1.AddItem "ComCtl3":       col.Add "File | C:\Windows\system32\Comct332.oca"    ' Microsoft Windows Common Controls-3 6.0 (SP5)
+    Combo1.AddItem "ComctlLib":     col.Add "File | C:\Windows\system32\comctl32.oca"    ' Microsoft Windows-Standardsteuerelemente 5.0 (SP2)
+    Combo1.AddItem "MCI":           col.Add "File | C:\Windows\system32\mci32.oca"       ' Microsoft Multimedia-Steuerelement 6.0
+    Combo1.AddItem "MSACAL":        col.Add "File | C:\Windows\system32\MSCAL.oca"       ' Microsoft Calendar Control 8.0
+    Combo1.AddItem "MSComDlg":      col.Add "File | C:\Windows\system32\ComDlg32.oca"    ' Microsoft Standarddialog-Steuerelement 6.0
+    Combo1.AddItem "MSCommLib":     col.Add "File | C:\Windows\system32\MSComm32.oca"    ' Microsoft Kommunikations-Steuerelement 6.0
+    Combo1.AddItem "MSDBCtls":      col.Add "File | C:\Windows\system32\dblist32.oca"    ' Microsoft - Datengebundene Listensteuerelemente 6.0
+    Combo1.AddItem "MSDBGrid":      col.Add "File | C:\Windows\system32\DBGRID32.oca"    ' Microsoft Datengebundenes Tabellensteuerelement 5.0 (SP3)
+    Combo1.AddItem "MSFlexGridLib": col.Add "File | C:\Windows\system32\MSFlxGrd.oca"    ' Microsoft FlexTabelle-Steuerelement (FlexGrid) 6.0
+    Combo1.AddItem "MSMask":        col.Add "File | C:\Windows\system32\msmask32.oca"    ' Microsoft Formatierte Bearbeitung-Steuerelement 6.0
+    Combo1.AddItem "RichTextLib":   col.Add "File | C:\Windows\system32\richtx32.oca"    ' Microsoft RTF-Steuerelement 6.0
+    Combo1.AddItem "TabDlg":        col.Add "File | C:\Windows\system32\TABCTL32.oca"    ' Microsoft Register-Steuerelement 6.0
+    Combo1.AddItem "MSXML2":        col.Add "File | C:\Windows\system32\msxml6.dll"      ' Microsoft XML, v6.0
+    Combo1.AddItem "Scripting":     col.Add "File | C:\Windows\system32\scrrun.dll"      ' Microsoft Scripting Runtime
+    Combo1.AddItem "WScript":       col.Add "File | C:\Windows\system32\Wshom.ocx"       ' Windows Script Host Object Model
+    Combo1.AddItem "Forms2":        col.Add "File | C:\Windows\System32\FM20.dll"        ' Microsoft Forms 2.0 Object Library
+    Combo1.AddItem "Office":        col.Add "File | C:\Program Files\Common Files\Microsoft Shared\OFFICE16\MSO.dll" '
+    Combo1.AddItem "Word":          col.Add "File | C:\Program Files\Microsoft Office\Office16\MSWORD.OLB" '
+    Combo1.AddItem "Excel":         col.Add "File | C:\Program Files\Microsoft Office\OFFICE16\EXCEL.EXE"  ' Microsoft Excel 11.0 Object Library
+    Combo1.AddItem "SHDocVwCtl":    col.Add "File | C:\WINDOWS\system32\ieframe.oca"                   ' Microsoft Internet Controls
 
 '   Combo1.AddItem "rvbparsero":    col.Add "File | C:\Programme\Microsoft Visual Studio\Common\Tools\VS-Ent98\vmodeler\rvbparsero.dll" 'Rose 4.0/Visual Basic Parser
 '
@@ -189,6 +210,12 @@ Private Sub Form_Load()
    UpdateForm
    Call SetMnuHelpstringChecked(MHelpCode.MyLCID)
 End Sub
+
+Sub ResetSearch()
+    SearchIndex = -1
+    SearchForName = ""
+End Sub
+
 Private Sub Form_Resize()
    Dim l As Single, t As Single, W As Single, H As Single
    Dim brdr As Single: 'brdr = 8 * IIf(Me.ScaleMode = vbTwips, Screen.TwipsPerPixelX, 1)
@@ -215,18 +242,51 @@ Private Sub List1_Click()
 End Sub
 
 Private Sub mnuCodeSearch_Click()
-    Dim s As String: s = InputBox("What do you search, give any name:", "Search for name")
-    If Len(s) Then
-        Dim si As String
-        Dim i As Long
-        Dim n As Long: n = List1.ListCount
-        For i = 0 To n - 1
-            si = List1.List(i)
-            If InStr(1, si, s, vbTextCompare) > 0 Then
-                List1.Text = si
-            End If
-        Next
-    End If
+    Dim s As String: s = InputBox("What do you want to find, give a name:", "Search for a name", SearchForName)
+    If StrPtr(s) = 0 Then Exit Sub 'Cancel
+    SearchForName = s
+    
+    'If Len(s) Then
+    '    SearchForName = s
+    SearchIndex = -1
+    SearchIndex = SearchNext(SearchForName, SearchIndex)
+        
+    mnuCodeSearchNext.Enabled = True
+        
+'        Dim si As String
+'        Dim i As Long
+'        Dim n As Long: n = List1.ListCount
+'        For i = 0 To n - 1
+'            si = List1.List(i)
+'            If InStr(1, si, SearchForName, vbTextCompare) > 0 Then
+'                'List1.Text = si
+'                List1.ListIndex = i
+'            End If
+'        Next
+'    End If
+End Sub
+Function SearchNext(aName As String, ByVal startIndex As Long) As Long
+    'return the found Index
+    Dim si As String
+    Dim i As Long
+    Dim n As Long: n = List1.ListCount
+    For i = startIndex + 1 To n - 1
+        si = List1.List(i)
+        If InStr(1, si, aName, vbTextCompare) > 0 Then
+            'List1.Text = si
+            List1.ListIndex = i
+            SearchNext = i
+            Exit Function
+        End If
+    Next
+End Function
+
+Private Sub mnuCodeSearchNext_Click()
+    SearchIndex = SearchNext(SearchForName, SearchIndex)
+End Sub
+
+Private Sub mnuHelpInfo_Click()
+    FAbout.Show vbModal, Me
 End Sub
 
 Private Sub mnuTlbOpenFile_Click()
