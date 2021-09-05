@@ -11,5 +11,6 @@ Project started in sept.2009.
 you need the following external modules or classes:  
 * Win_Dialogs: OpenFileDialog.cls, SaveFileDialog.cls  
 * Ctrl_Splitter: Splitter.cls  
-* WhatsInTheVariant: MEVbVarType  
+* WhatsInTheVariant: MEVbVarType.bas  
+  
 ![TyTex Image](Resources/TyTex.png "TyTex Image")  

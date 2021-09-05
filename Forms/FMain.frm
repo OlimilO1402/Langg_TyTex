@@ -197,6 +197,7 @@ Private Sub Form_Load()
     'Combo1.AddItem "MBOFastGeoD":   col.Add "File | D:\VB60To_dotNETClasses\VB6_To_Delphi\FastGeoD\Tlb\MBOFastGeoD.tlb"
     Combo1.AddItem "VBA":           col.Add "File | C:\WINDOWS\system32\msvbvm60.dll"
     Combo1.AddItem "VBRUN":         col.Add "{EA544A21-C82D-11D1-A3E4-00A0C90AEA82} | 6 | 0 | 9"
+    
     'Combo1.AddItem "VB":            col.Add "File | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB"
     'Combo1.AddItem "VBIDE":         col.Add "File | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6EXT.OLB" '
     
@@ -246,14 +247,14 @@ Sub ResetSearch()
 End Sub
 
 Private Sub Form_Resize()
-   Dim L As Single, T As Single, W As Single, H As Single
-   T = Panel1.Top
-   W = Me.ScaleWidth
-   H = Me.ScaleHeight - T
-      If W > 0 And H > 0 Then
-      Panel1.Move L, T, W, H
-      Text2.Width = TBCode.Width
-   End If
+    Dim L As Single, T As Single, W As Single, H As Single
+    T = Panel1.Top
+    W = Me.ScaleWidth
+    H = Me.ScaleHeight - T
+    If W > 0 And H > 0 Then
+        Panel1.Move L, T, W, H
+        Text2.Width = TBCode.Width
+    End If
 End Sub
 
 Public Property Get OFD() As OpenFileDialog
@@ -331,12 +332,13 @@ Private Sub mnuTlbOpenFile_Click()
         aOFD.InitialDirectory = "C:\Windows\System32\"
     End If
     If aOFD.ShowDialog = vbCancel Then Exit Sub
-    If Len(aOFD.FileName) > 0 Then
-        Dim f As String: f = aOFD.FileName
+    Dim f As String: f = aOFD.FileName
+    If Len(f) > 0 Then
         Dim s As String: s = "File | " & f
-        Combo1.AddItem myTlb.TypeLibInfo.Name:  col.Add s
-        Combo1.ListIndex = Combo1.ListCount - 1
-        OpenFile f
+        If OpenFile(f) Then
+            Combo1.AddItem myTlb.TypeLibInfo.Name:  col.Add s
+            Combo1.ListIndex = Combo1.ListCount - 1
+        End If
     End If
 End Sub
 
@@ -344,9 +346,10 @@ Private Sub mnuTlbOpenReg_Click()
     Dim s As String: s = InputBox("Please give: guid maj min lcid")
     If StrPtr(s) = 0 Then Exit Sub
     Dim sa() As String: sa = Split(s, " ")
-    OpenReg sa
-    s = Join(sa, " | ") ' sa(1) & " | " & sa(2) & " | " & sa(3)
-    Combo1.AddItem myTlb.TypeLibInfo.Name:  col.Add s
+    If OpenReg(sa) Then
+        s = Join(sa, " | ") ' sa(1) & " | " & sa(2) & " | " & sa(3)
+        Combo1.AddItem myTlb.TypeLibInfo.Name:  col.Add s
+    End If
 End Sub
 
 Private Sub mnuTlbOpenDir_Click()
@@ -463,7 +466,6 @@ Private Sub mnuExtrasStatisticMethod_Click()
     mnuExtrasStatisticMethod.Checked = True
 End Sub
 
-
 Private Sub OpenTlB(i As Integer, ByVal bUpdateView As Boolean)
     Dim s As String: s = col.item(i + 1)
     Dim sa() As String: sa = Split(s, " | ")
@@ -482,17 +484,17 @@ Private Sub OpenTlB(i As Integer, ByVal bUpdateView As Boolean)
     End If
 End Sub
 
-Private Sub OpenFile(aFilename As String)
+Private Function OpenFile(aFilename As String) As Boolean
     Dim aNewTlb As New TypeLibrary
-    Call aNewTlb.LoadFile(aFilename)
-    Set NewTlB = aNewTlb
-End Sub
+    OpenFile = aNewTlb.LoadFile(aFilename)
+    If OpenFile Then Set NewTlB = aNewTlb
+End Function
 
-Private Sub OpenReg(sa() As String)
+Private Function OpenReg(sa() As String) As Boolean
     Dim aNewTlb As New TypeLibrary
-    Call aNewTlb.LoadReg(sa(0), sa(1), sa(2), sa(3))
-    Set NewTlB = aNewTlb
-End Sub
+    OpenReg = aNewTlb.LoadReg(sa(0), sa(1), sa(2), sa(3))
+    If OpenReg Then Set NewTlB = aNewTlb
+End Function
 
 Private Property Set NewTlB(aNewTlb As TypeLibrary)
     If Not aNewTlb.TypeLibInfo Is Nothing Then

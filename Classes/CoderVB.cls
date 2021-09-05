@@ -43,13 +43,13 @@ Private Function EnumConstToCode(mi As MemberInfo, ByVal bIsFlagEnum As Boolean)
    Dim s As String, v As Integer
    Dim b() As Byte, i As Integer
    Dim hx As String: hx = "&H"
-   If Not IsMissing(mi.value) Then
-      If IsNumeric(mi.value) Then
-         s = s & " = " & IIf((bIsFlagEnum Or (mi.value < 0)), hx & Hex$(mi.value), CStr(mi.value))
+   If Not IsMissing(mi.Value) Then
+      If IsNumeric(mi.Value) Then
+         s = s & " = " & IIf((bIsFlagEnum Or (mi.Value < 0)), hx & Hex$(mi.Value), CStr(mi.Value))
       Else
-         If Len(mi.value) > 0 Then
+         If Len(mi.Value) > 0 Then
             s = s & " = "
-            b = mi.value
+            b = mi.Value
             s = s & "AscW(ChrW(" & hx
             For i = UBound(b) To 0 Step -1
                s = s & Hex(b(i))
@@ -310,9 +310,9 @@ Private Function ParamsToCode(mi As MemberInfo) As String
    cnt = mi.Parameters.Count
    For i = 1 To cnt
       Set pi = mi.Parameters(i)
-      s = s & ParamFlagsToCode(pi.Flags) & pi.Name & ReturnTypeToCode(pi.VarTypeInfo)
-      If pi.Flags And PARAMFLAG_FOPT Then
-         If pi.Flags And PARAMFLAG_FHASDEFAULT Then
+      s = s & ParamFlagsToCode(pi.flags) & pi.Name & ReturnTypeToCode(pi.VarTypeInfo)
+      If pi.flags And PARAMFLAG_FOPT Then
+         If pi.flags And PARAMFLAG_FHASDEFAULT Then
             s = s & " = " & pi.DefaultValue
          End If
       End If
@@ -437,7 +437,7 @@ Private Function ImplementsToCode(aClass As TLI.CoClassInfo) As String
          If c > 0 Then
             s = vbCrLf & s
          End If
-         s = s & MInd.Peek & "Implements " & ii.Name
+         s = s & MInd.Peek & "Implements " & ii.Name & vbCrLf
       End If
    Next
    MInd.Pop

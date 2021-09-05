@@ -20,7 +20,7 @@ Public Sub NewC(aFilename As String)
    Call LoadFile(aFilename)
 End Sub
 Public Function LoadFile(aFilename As String) As Boolean
-try: On Error GoTo Catch
+Try: On Error GoTo Catch
    Dim newTLI As TypeLibInfo
    myFile = aFilename
    Set newTLI = myTLIApp.TypeLibInfoFromFile(aFilename)
@@ -30,11 +30,11 @@ try: On Error GoTo Catch
 Catch:
    MsgBox Err.Description
 End Function
-Public Function LoadReg(ByVal aGUID As String, ByVal maj As Integer, ByVal min As Integer, ByVal LCID As Long) As Boolean
-try: On Error GoTo Catch
+Public Function LoadReg(ByVal aGUID As String, ByVal maj As Integer, ByVal Min As Integer, ByVal LCID As Long) As Boolean
+Try: On Error GoTo Catch
    Dim newTLI As TypeLibInfo
    'myFile = aGUID & " " & CStr(maj) & " " & CStr(min) & " " & CStr(LCID)
-   Set newTLI = myTLIApp.TypeLibInfoFromRegistry(aGUID, maj, min, LCID)
+   Set newTLI = myTLIApp.TypeLibInfoFromRegistry(aGUID, maj, Min, LCID)
    myFile = newTLI.ContainingFile
    Set myTli = newTLI
    LoadReg = True
@@ -58,57 +58,56 @@ Public Property Get TypeLibInfo() As TypeLibInfo
 End Property
 
 Public Sub TypesToListBox(aLB As ListBox)
-   aLB.Clear
-   Call EnumsToListBox(aLB)
-   Call UDTypesToListBox(aLB)
-   Call ModulesToListBox(aLB)
-   Call ClassesToListBox(aLB)
-   Call InterfacesToListBox(aLB)
-   Call AliasesToListBox(aLB)
-   Call UnionsToListBox(aLB)
-   'also unions
+    aLB.Clear
+    EnumsToListBox aLB
+    UDTypesToListBox aLB
+    ModulesToListBox aLB
+    ClassesToListBox aLB
+    InterfacesToListBox aLB
+    AliasesToListBox aLB
+    UnionsToListBox aLB
 End Sub
 Private Sub EnumsToListBox(aLB As ListBox)
-   Dim ci As TLI.ConstantInfo
-   For Each ci In myTli.Constants
-      Call aLB.AddItem("Enum " & ci.Name)
-   Next
+    Dim ci As TLI.ConstantInfo
+    For Each ci In myTli.Constants
+        Call aLB.AddItem("Enum " & ci.Name)
+    Next
 End Sub
 Private Sub UDTypesToListBox(aLB As ListBox)
-   Dim ri As TLI.RecordInfo
-   For Each ri In myTli.Records
-      Call aLB.AddItem("Type " & ri.Name)
-   Next
+    Dim ri As TLI.RecordInfo
+    For Each ri In myTli.Records
+        Call aLB.AddItem("Type " & ri.Name)
+    Next
 End Sub
 Private Sub ModulesToListBox(aLB As ListBox)
-   Dim di As DeclarationInfo
-   For Each di In myTli.Declarations
-      Call aLB.AddItem("Module " & di.Name)
-   Next
+    Dim di As DeclarationInfo
+    For Each di In myTli.Declarations
+        Call aLB.AddItem("Module " & di.Name)
+    Next
 End Sub
 Private Sub ClassesToListBox(aLB As ListBox)
-   Dim ci As TLI.CoClassInfo
-   For Each ci In myTli.CoClasses
-      Call aLB.AddItem("Class " & ci.Name)
-   Next
+    Dim ci As TLI.CoClassInfo
+    For Each ci In myTli.CoClasses
+        Call aLB.AddItem("Class " & ci.Name)
+    Next
 End Sub
 Private Sub InterfacesToListBox(aLB As ListBox)
-   Dim ii As TLI.InterfaceInfo
-   For Each ii In myTli.Interfaces
-      Call aLB.AddItem("Interface " & ii.Name)
-   Next
+    Dim ii As TLI.InterfaceInfo
+    For Each ii In myTli.Interfaces
+        Call aLB.AddItem("Interface " & ii.Name)
+    Next
 End Sub
 Private Sub AliasesToListBox(aLB As ListBox)
-   Dim ai As TLI.IntrinsicAliasInfo
-   For Each ai In myTli.IntrinsicAliases
-      Call aLB.AddItem("Alias " & ai.Name)
-   Next
+    Dim ai As TLI.IntrinsicAliasInfo
+    For Each ai In myTli.IntrinsicAliases
+        Call aLB.AddItem("Alias " & ai.Name)
+    Next
 End Sub
 Private Sub UnionsToListBox(aLB As ListBox)
-   Dim ui As TLI.UnionInfo
-   For Each ui In myTli.Unions
-      Call aLB.AddItem("Union " & ui.Name)
-   Next
+    Dim ui As TLI.UnionInfo
+    For Each ui In myTli.Unions
+        Call aLB.AddItem("Union " & ui.Name)
+    Next
 End Sub
 
 Public Sub ItemToTextBox(aCoder As ICoder, aItem As String, aTB As TextBox)
@@ -257,13 +256,13 @@ Public Function getEventsStatistic() As String
    Dim i As Integer
    'für jedes Event die Klasse dazunehmen die das Event hat
    ReDim sVals(0 To UBound(sKeys)) As String
-   Dim l As Integer: l = GetMaxStringLen(sKeys)
-   Dim sHL As String: sHL = Space(l + 2)
+   Dim L As Integer: L = GetMaxStringLen(sKeys)
+   Dim sHL As String: sHL = Space(L + 2)
    For Each ci In myTli.CoClasses
       sHL = sHL & ci.Name & "; "
    Next
    For i = 0 To UBound(sKeys)
-      s = PadRight(sKeys(i), l) & ": "
+      s = PadRight(sKeys(i), L) & ": "
       For Each ci In myTli.CoClasses
          'If ContainsMember(ci.DefaultEventInterface, sKeys(i)) Then
          '   s = s & ci.Name & "; "
@@ -309,13 +308,13 @@ Public Function getMethodsStatistic() As String
    Dim i As Integer
    'für jede Methode die Klasse dazunehmen die diese Methode hat
    ReDim sVals(0 To UBound(sKeys)) As String
-   Dim l As Integer: l = GetMaxStringLen(sKeys)
-   Dim sHL As String: sHL = Space(l + 2)
+   Dim L As Integer: L = GetMaxStringLen(sKeys)
+   Dim sHL As String: sHL = Space(L + 2)
    For Each ci In myTli.CoClasses
       sHL = sHL & ci.Name & "; "
    Next
    For i = 0 To UBound(sKeys)
-      s = PadRight(sKeys(i), l) & ": "
+      s = PadRight(sKeys(i), L) & ": "
       For Each ci In myTli.CoClasses
          'If ContainsMember(ci.DefaultEventInterface, sKeys(i)) Then
          '   s = s & ci.Name & "; "
