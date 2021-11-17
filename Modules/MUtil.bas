@@ -177,66 +177,20 @@ Public Function ContainsMember(aInterface As InterfaceInfo, MemberName As String
         End If
     Next
 End Function
-' String
-Public Function PadRight(StrVal As String, _
-                         ByVal totalWidth As Long, _
-                         Optional ByVal padChar As String) As String
-    
-    ' Returns the String StrVal with the specified length.
-    ' totalWidth: the length of the returned string
-    '             if totalWidth is smaller then the length of StrVal then
-    '             StrVal will be returned
-    ' padChar:    on the right hand side it will be filed up with padChar
-    '             if padChar is not specified, the returned string will be
-    '             filled up with spaces.
-    '
-    If Len(padChar) Then
-        PadRight = StrVal
-        If Len(StrVal) <= totalWidth Then _
-            PadRight = PadRight & String$(totalWidth - Len(StrVal), padChar)
-    Else
-        PadRight = Space$(totalWidth)
-        LSet PadRight = StrVal
-    End If
-    
-End Function
-Public Function PadLeft(StrVal As String, _
-                        ByVal totalWidth As Long, _
-                        Optional ByVal padChar As String) As String
-    
-    ' Returns the String StrVal with the specified length.
-    ' totalWidth: the length of the returned string
-    '             if totalWidth is smaller then the length of StrVal then
-    '             StrVal will be returned
-    ' padChar:    on the left hand side it will be filled up with padChar
-    '             if padChar is not specified, the returned string will be
-    '             filled up with spaces.
-    '
-    If Len(padChar) Then
-        PadLeft = StrVal
-        If Len(StrVal) <= totalWidth Then _
-            PadLeft = String$(totalWidth - Len(StrVal), padChar) & PadLeft
-    Else
-        PadLeft = Space$(totalWidth)
-        RSet PadLeft = StrVal
-    End If
-    
-End Function
-
 
 'PathFileName
 Public Function GetDir(ByVal aPath As String) As String
     On Error Resume Next
     GetDir = aPath
     If IsDir(GetDir) Then Exit Function
-    Dim Pos As Long
+    Dim pos As Long
     
-    Pos = InStrRev(GetDir, "\")
-    If Pos > 0 Then GetDir = Left$(GetDir, Pos - 1)
+    pos = InStrRev(GetDir, "\")
+    If pos > 0 Then GetDir = Left$(GetDir, pos - 1)
     If IsDir(GetDir) Then Exit Function
     
-    Pos = InStrRev(GetDir, "\")
-    If Pos > 0 Then GetDir = Left$(GetDir, Pos - 1)
+    pos = InStrRev(GetDir, "\")
+    If pos > 0 Then GetDir = Left$(GetDir, pos - 1)
     If IsDir(GetDir) Then Exit Function
     GetDir = ""
 End Function
