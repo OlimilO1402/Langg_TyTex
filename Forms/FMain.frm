@@ -239,6 +239,9 @@ Private Sub Form_Load()
    Splitter1.LeftTopPos = Me.LBTypes.Width
    Splitter1.BorderStyle = bsXPStyl
 
+    Dim AllTlbs As Collection
+    Set AllTlbs = MUtil.EnumTypeLibs
+    
 End Sub
 
 Sub ResetSearch()

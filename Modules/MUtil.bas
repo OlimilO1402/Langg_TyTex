@@ -42,7 +42,7 @@ Public Function IsFlags(aEnum As ConstantInfo)
     Dim mi As MemberInfo
     'IsFlags = False 'eh klar
     For Each mi In aEnum.Members
-        If Not FlagListContains(mi.Value) Then Exit Function
+        If Not FlagListContains(mi.value) Then Exit Function
     Next
     IsFlags = True
 End Function
@@ -52,10 +52,10 @@ Private Sub CreateFlagList()
         FlagList(i) = CDec(CDec(2) ^ CDec(i))
     Next
 End Sub
-Private Function FlagListContains(Value) As Boolean
+Private Function FlagListContains(value) As Boolean
     Dim i As Integer
     For i = 0 To uFlags
-        If FlagList(i) = CDec(Value) Then
+        If FlagList(i) = CDec(value) Then
             FlagListContains = True
             Exit Function
         End If
@@ -183,14 +183,14 @@ Public Function GetDir(ByVal aPath As String) As String
     On Error Resume Next
     GetDir = aPath
     If IsDir(GetDir) Then Exit Function
-    Dim pos As Long
+    Dim Pos As Long
     
-    pos = InStrRev(GetDir, "\")
-    If pos > 0 Then GetDir = Left$(GetDir, pos - 1)
+    Pos = InStrRev(GetDir, "\")
+    If Pos > 0 Then GetDir = Left$(GetDir, Pos - 1)
     If IsDir(GetDir) Then Exit Function
     
-    pos = InStrRev(GetDir, "\")
-    If pos > 0 Then GetDir = Left$(GetDir, pos - 1)
+    Pos = InStrRev(GetDir, "\")
+    If Pos > 0 Then GetDir = Left$(GetDir, Pos - 1)
     If IsDir(GetDir) Then Exit Function
     GetDir = ""
 End Function
@@ -269,4 +269,155 @@ Private Function divide(sArr() As String, ByVal i1 As Long, ByVal i2 As Long) As
     Call Swap(sArr, i, p)
     divide = i
 End Function
+
+
+' uses
+'  Registry;
+
+'
+'// Example Call:
+'
+'procedure TForm1.Button1Click(Sender: TObject);
+'begin
+'  EnumTypeLibs(ListBox1.Items);
+'end;
+
+
+
+'procedure EnumTypeLibs(TypeLibNames: TStrings);
+'var
+'  f: TRegistry;
+'  keyNames, keyVersions, keyInfos: TStringList;
+'  keyName, keyVersion, keyInfo, tlName: string;
+'  i, j, k: Integer;
+'begin
+'  TypeLibNames.Clear;
+'  keyNames := nil;
+'  keyVersions := nil;
+'  keyInfos := nil;
+'  f := TRegistry.Create;
+'  Try
+'    keyNames := TStringList.Create;
+'    keyVersions := TStringList.Create;
+'    keyInfos := TStringList.Create;
+'    f.RootKey := HKEY_CLASSES_ROOT;
+'    if not f.OpenKey('TypeLib', False) then raise
+'      Exception.Create('TRegistry.Open');
+'    f.GetKeyNames(keyNames);
+'    f.CloseKey;
+'    for i := 0 to keyNames.Count - 1 do
+'    begin
+'      keyName := keyNames.Strings[i];
+'      if not f.OpenKey(Format('TypeLib\%s', [keyName]), False) then Continue;
+'      f.GetKeyNames(keyVersions);
+'      f.CloseKey;
+'      for j := 0 to keyVersions.Count - 1 do
+'      begin
+'        keyVersion := keyVersions.Strings[j];
+'        if not f.OpenKey(Format('TypeLib\%s\%s', [keyName, keyVersion]), False) then
+'          Continue;
+'        tlName := f.ReadString('');
+'        f.GetKeyNames(keyInfos);
+'        f.CloseKey;
+'        {$B-}
+'        for k := 0 to keyInfos.Count - 1 do
+'        begin
+'          keyInfo := keyInfos.Strings[k];
+'          if (keyInfo = '') or (keyInfo[1] < '0') or (keyInfo[1] > '9') then Continue;
+'          if not f.OpenKey(Format('TypeLib\%s\%s\%s\win32', [keyName, keyVersion, keyInfo]), False) then Continue;
+'          f.CloseKey;
+'          TypeLibNames.Add(Format('%s ver.%s', [tlName, keyVersion]));
+'        end;
+'       {$B+}
+'      end;
+'    end;
+'  Finally
+'    f.Free;
+'    keyNames.Free;
+'    keyVersions.Free;
+'    keyInfos.Free;
+'  end;
+'end;
+Public Function EnumTypeLibs() As Collection
+    Const tlkey As String = "TypeLib"
+Try: On Error GoTo Catch
+    Registry.RootKey = HKEY_CLASSES_ROOT
+    If Not Registry.OpenKey(tlkey, False) Then
+        ErrHandler "EnumTypeLibs", "Could not open registry-key: " & "HKEY_CLASSES_ROOT" & "\" & tlkey
+        Exit Function
+    End If
+    Dim KeyNames     As Collection ': Set KeyNames = New Collection
+    Dim KeyVersions  As Collection ': Set KeyVersions = New Collection
+    Dim keyInfos     As Collection ': Set keyInfos = New Collection
+    Dim TypeLibNames As Collection: Set TypeLibNames = New Collection
+    Registry.GetKeyNames KeyNames
+    Registry.CloseKey
+    Dim KeyName As String, keyVersion As String, tlName As String, keyInfo As String
+    Dim i As Long, j As Long, k As Long
+    For i = 1 To KeyNames.Count
+        KeyName = KeyNames.item(i)
+        If Not Registry.OpenKey(tlkey & "\" & KeyName, False) Then
+            ErrHandler "EnumTypeLibs", "Could not open registry-key: " & "HKEY_CLASSES_ROOT" & "\" & tlkey
+        Else
+            Registry.GetKeyNames KeyVersions
+            Registry.CloseKey
+            For j = 1 To KeyVersions.Count
+                keyVersion = KeyVersions.item(j)
+                If Not Registry.OpenKey(tlkey & "\" & KeyName & "\" & keyVersion, False) Then
+                    ErrHandler "EnumTypeLibs", "Could not open registry-key: " & tlkey & "\" & KeyName & "\" & keyVersion
+                Else
+                    tlName = Registry.ReadString("")
+                    Registry.GetKeyNames keyInfos
+                    Registry.CloseKey
+                    For k = 1 To keyInfos.Count
+                        keyInfo = keyInfos.item(k)
+                        keyInfo = Trim(keyInfo)
+                        If Len(keyInfo) Then
+                            If Not Registry.OpenKey(tlkey & "\" & KeyName & "\" & keyVersion & "\" & keyInfo & "\" & "win32", False) Then
+                                ErrHandler "EnumTypeLibs", "Could not open registry-key: " & tlkey & "\" & KeyName & "\" & keyVersion & "\" & keyInfo & "\" & "win32"
+                            Else
+                                Registry.CloseKey
+                                TypeLibNames.Add tlName & " v." & keyVersion
+                            End If
+                        End If
+                    Next
+                End If
+            Next
+        End If
+    Next
+    Set EnumTypeLibs = TypeLibNames
+    GoTo Finally
+Catch:
+    ErrHandler "EnumTypeLibs"
+Finally:
+    'Registry.Free
+    Registry.CloseKey
+End Function
+
+
+' #################### ' Local ErrHandler  ' #################### '
+''copy this same function to every class or form
+''the name of the class or form will be added automatically
+''in standard-modules the function "TypeName(Me)" will not work, so simply replace it with the name of the Module
+'' v ############################## v '   Local ErrHandler   ' v ############################## v '
+Private Function ErrHandler(ByVal FuncName As String, _
+                            Optional AddInfo As String, _
+                            Optional WinApiError, _
+                            Optional bLoud As Boolean = True, _
+                            Optional bErrLog As Boolean = True, _
+                            Optional vbDecor As VbMsgBoxStyle = vbOKOnly, _
+                            Optional bRetry As Boolean) As VbMsgBoxResult
+
+    If bRetry Then
+        
+        ErrHandler = MessErrorRetry("MUtil", FuncName, AddInfo, WinApiError, bErrLog)
+        
+    Else
+        
+        ErrHandler = MessError("MUtil", FuncName, AddInfo, WinApiError, bLoud, bErrLog, vbDecor)
+        
+    End If
+    
+End Function
+
 
