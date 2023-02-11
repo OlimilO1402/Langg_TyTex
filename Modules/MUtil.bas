@@ -42,7 +42,7 @@ Public Function IsFlags(aEnum As ConstantInfo)
     Dim mi As MemberInfo
     'IsFlags = False 'eh klar
     For Each mi In aEnum.Members
-        If Not FlagListContains(mi.value) Then Exit Function
+        If Not FlagListContains(mi.Value) Then Exit Function
     Next
     IsFlags = True
 End Function
@@ -52,10 +52,10 @@ Private Sub CreateFlagList()
         FlagList(i) = CDec(CDec(2) ^ CDec(i))
     Next
 End Sub
-Private Function FlagListContains(value) As Boolean
+Private Function FlagListContains(Value) As Boolean
     Dim i As Integer
     For i = 0 To uFlags
-        If FlagList(i) = CDec(value) Then
+        If FlagList(i) = CDec(Value) Then
             FlagListContains = True
             Exit Function
         End If
@@ -183,14 +183,14 @@ Public Function GetDir(ByVal aPath As String) As String
     On Error Resume Next
     GetDir = aPath
     If IsDir(GetDir) Then Exit Function
-    Dim Pos As Long
+    Dim pos As Long
     
-    Pos = InStrRev(GetDir, "\")
-    If Pos > 0 Then GetDir = Left$(GetDir, Pos - 1)
+    pos = InStrRev(GetDir, "\")
+    If pos > 0 Then GetDir = Left$(GetDir, pos - 1)
     If IsDir(GetDir) Then Exit Function
     
-    Pos = InStrRev(GetDir, "\")
-    If Pos > 0 Then GetDir = Left$(GetDir, Pos - 1)
+    pos = InStrRev(GetDir, "\")
+    If pos > 0 Then GetDir = Left$(GetDir, pos - 1)
     If IsDir(GetDir) Then Exit Function
     GetDir = ""
 End Function
@@ -234,8 +234,8 @@ End Sub
 Public Sub Sort(sArr() As String)
     Call QuickSort(sArr, LBound(sArr), UBound(sArr))
 End Sub
-Private Function Compare(sArr() As String, ByVal i1 As Long, ByVal i2 As Long) As Long
-    Compare = StrComp(sArr(i1), sArr(i2), vbTextCompare) 'vbBinaryCompare)
+Private Function compare(sArr() As String, ByVal i1 As Long, ByVal i2 As Long) As Long
+    compare = StrComp(sArr(i1), sArr(i2), vbTextCompare) 'vbBinaryCompare)
 End Function
 Private Sub Swap(sArr() As String, ByVal i1 As Long, ByVal i2 As Long)
     Dim aTemp As String: aTemp = sArr(i1)
@@ -260,10 +260,10 @@ Private Function divide(sArr() As String, ByVal i1 As Long, ByVal i2 As Long) As
     Do
         Do
             i = i + 1
-        Loop While (Compare(sArr, i, p) < 0)
+        Loop While (compare(sArr, i, p) < 0)
         Do
             j = j - 1
-        Loop While ((i1 < j) And (Compare(sArr, p, j) < 0))
+        Loop While ((i1 < j) And (compare(sArr, p, j) < 0))
         If i < j Then Call Swap(sArr, i, j)
     Loop While (i < j)
     Call Swap(sArr, i, p)
@@ -351,20 +351,28 @@ Try: On Error GoTo Catch
     Dim keyInfos     As Collection ': Set keyInfos = New Collection
     Dim TypeLibNames As Collection: Set TypeLibNames = New Collection
     Registry.GetKeyNames KeyNames
-    Registry.CloseKey
-    Dim KeyName As String, keyVersion As String, tlName As String, keyInfo As String
+    'Registry.CloseKey
+    Dim keyName As String, keyVersion As String, tlName As String, keyInfo As String
     Dim i As Long, j As Long, k As Long
+'    If Not Registry.OpenKey(tlkey, False) Then
+'        ErrHandler "EnumTypeLibs", "Could not open registry-key: " & "HKEY_CLASSES_ROOT" & "\" & tlkey
+'        'Exit Function
+'        GoTo Finally
+'    End If
     For i = 1 To KeyNames.Count
-        KeyName = KeyNames.item(i)
-        If Not Registry.OpenKey(tlkey & "\" & KeyName, False) Then
-            ErrHandler "EnumTypeLibs", "Could not open registry-key: " & "HKEY_CLASSES_ROOT" & "\" & tlkey
+        keyName = KeyNames.item(i)
+        If Not Registry.OpenKey(tlkey & "\" & keyName, False) Then
+            ErrHandler "EnumTypeLibs", "Could not open registry-key: " & Registry.CurrentPath & "\" & keyName
+            Registry.CloseKey
+            Exit Function
         Else
             Registry.GetKeyNames KeyVersions
-            Registry.CloseKey
+            'Registry.CloseKey
             For j = 1 To KeyVersions.Count
                 keyVersion = KeyVersions.item(j)
-                If Not Registry.OpenKey(tlkey & "\" & KeyName & "\" & keyVersion, False) Then
-                    ErrHandler "EnumTypeLibs", "Could not open registry-key: " & tlkey & "\" & KeyName & "\" & keyVersion
+                If Not Registry.OpenKey(tlkey & "\" & keyName & "\" & keyVersion, False) Then
+                    ErrHandler "EnumTypeLibs", "Could not open registry-key: " & Registry.CurrentPath & "\" & keyName & "\" & keyVersion
+                    Registry.CloseKey
                 Else
                     tlName = Registry.ReadString("")
                     Registry.GetKeyNames keyInfos
@@ -373,8 +381,8 @@ Try: On Error GoTo Catch
                         keyInfo = keyInfos.item(k)
                         keyInfo = Trim(keyInfo)
                         If Len(keyInfo) Then
-                            If Not Registry.OpenKey(tlkey & "\" & KeyName & "\" & keyVersion & "\" & keyInfo & "\" & "win32", False) Then
-                                ErrHandler "EnumTypeLibs", "Could not open registry-key: " & tlkey & "\" & KeyName & "\" & keyVersion & "\" & keyInfo & "\" & "win32"
+                            If Not Registry.OpenKey(tlkey & "\" & keyName & "\" & keyVersion & "\" & keyInfo & "\" & "win32", False) Then
+                                ErrHandler "EnumTypeLibs", "Could not open registry-key: " & tlkey & "\" & keyName & "\" & keyVersion & "\" & keyInfo & "\" & "win32"
                             Else
                                 Registry.CloseKey
                                 TypeLibNames.Add tlName & " v." & keyVersion

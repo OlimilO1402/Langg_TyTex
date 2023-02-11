@@ -1,24 +1,24 @@
 VERSION 5.00
 Begin VB.Form FMain 
    Caption         =   "TyTex"
-   ClientHeight    =   6495
+   ClientHeight    =   10590
    ClientLeft      =   225
    ClientTop       =   870
-   ClientWidth     =   10215
+   ClientWidth     =   14895
    Icon            =   "FMain.frx":0000
    LinkTopic       =   "Form1"
-   ScaleHeight     =   6495
-   ScaleWidth      =   10215
+   ScaleHeight     =   10590
+   ScaleWidth      =   14895
    StartUpPosition =   3  'Windows-Standard
    Begin VB.PictureBox Panel1 
       BorderStyle     =   0  'Kein
-      Height          =   6015
+      Height          =   9135
       Left            =   0
-      ScaleHeight     =   6015
-      ScaleWidth      =   9975
+      ScaleHeight     =   9135
+      ScaleWidth      =   14055
       TabIndex        =   2
       Top             =   360
-      Width           =   9975
+      Width           =   14055
       Begin VB.TextBox TBCode 
          BeginProperty Font 
             Name            =   "Consolas"
@@ -29,13 +29,13 @@ Begin VB.Form FMain
             Italic          =   0   'False
             Strikethrough   =   0   'False
          EndProperty
-         Height          =   5895
-         Left            =   3120
+         Height          =   7815
+         Left            =   3480
          MultiLine       =   -1  'True
          ScrollBars      =   3  'Beides
          TabIndex        =   4
          Top             =   0
-         Width           =   6735
+         Width           =   10335
       End
       Begin VB.ListBox LBTypes 
          BeginProperty Font 
@@ -47,20 +47,20 @@ Begin VB.Form FMain
             Italic          =   0   'False
             Strikethrough   =   0   'False
          EndProperty
-         Height          =   5580
+         Height          =   7740
          IntegralHeight  =   0   'False
          Left            =   0
          TabIndex        =   3
          Top             =   0
-         Width           =   3015
+         Width           =   3375
       End
    End
    Begin VB.TextBox Text2 
       Height          =   285
-      Left            =   3120
+      Left            =   3480
       TabIndex        =   1
       Top             =   0
-      Width           =   6735
+      Width           =   10215
    End
    Begin VB.ComboBox Combo1 
       BeginProperty Font 
@@ -77,7 +77,7 @@ Begin VB.Form FMain
       TabIndex        =   0
       Text            =   "Combo1"
       Top             =   0
-      Width           =   3015
+      Width           =   3375
    End
    Begin VB.Menu mnuTlb 
       Caption         =   "File"
@@ -108,7 +108,6 @@ Begin VB.Form FMain
       End
       Begin VB.Menu mnuTlbExit 
          Caption         =   "Exit"
-         Shortcut        =   ^X
       End
    End
    Begin VB.Menu mnuCode 
@@ -240,7 +239,7 @@ Private Sub Form_Load()
    Splitter1.BorderStyle = bsXPStyl
 
     Dim AllTlbs As Collection
-    Set AllTlbs = MUtil.EnumTypeLibs
+    'Set AllTlbs = MUtil.EnumTypeLibs
     
 End Sub
 
@@ -362,23 +361,23 @@ Private Sub mnuTlbOpenDir_Click()
 End Sub
 
 Private Sub mnuTlbSaveAs_Click()
-   Dim aSFD As SaveFileDialog: Set aSFD = Me.SFD
-   'OFD.ShowSave
-   If aSFD.ShowDialog = vbCancel Then Exit Sub
-   If aSFD.FileName <> "" Then
-      Dim f As String: f = aSFD.FileName
-      Dim d As String
-      Dim i As Integer
-      For i = 0 To Combo1.ListCount - 1
-         Call OpenTlB(i, False)
-         d = GetDir(f) & "\VB"
-         If Not IsDir(d) Then Call MkDir(d)
-         Call myTlb.SaveFiles(d, New CoderVB)
-         d = GetDir(f) & "\Java"
-         If Not IsDir(d) Then Call MkDir(d)
-         Call myTlb.SaveFiles(d, New CoderJava)
-      Next
-   End If
+    Dim aSFD As SaveFileDialog: Set aSFD = Me.SFD
+    'OFD.ShowSave
+    If aSFD.ShowDialog = vbCancel Then Exit Sub
+    If aSFD.FileName <> "" Then
+        Dim f As String: f = aSFD.FileName
+        Dim d As String
+        Dim i As Integer
+        For i = 0 To Combo1.ListCount - 1
+            Call OpenTlB(i, False)
+            d = GetDir(f) & "\VB"
+            If Not IsDir(d) Then Call MkDir(d)
+            Call myTlb.SaveFiles(d, New CoderVB)
+            d = GetDir(f) & "\Java"
+            If Not IsDir(d) Then Call MkDir(d)
+            Call myTlb.SaveFiles(d, New CoderJava)
+        Next
+    End If
 End Sub
 
 Private Sub mnuTlbExit_Click()
@@ -394,7 +393,7 @@ Private Sub mnuCodeJava_Click()
 End Sub
 
 Private Sub mnuCodeCpp_Click()
-   Call SelectCoder(New CoderCpp)
+    Call SelectCoder(New CoderCpp)
 End Sub
 
 Private Sub SelectCoder(aCoder As ICoder)
